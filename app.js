@@ -1,44 +1,299 @@
-const $ = (s) => document.querySelector(s);
-const order = { perfect: 0, playable: 1, menu: 2, unplayable: 3 };
-let games = [], sortKey = "reports", sortDir = -1;
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
 
-fetch("database.json").then(r => r.json()).then(d => { games = d; render(); });
+const statusOrder = {
+  perfect: 0,
+  playable: 1,
+  menu: 2,
+  unplayable: 3,
+  unknown: 4
+};
+
+let games = [];
+let sortKey = "reports";
+let sortDirection = -1;
+
+fetch("database.json")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return response.json();
+  })
+  .then((data) => {
+    games = Array.isArray(data) ? data : [];
+
+    updateSummary();
+    render();
+  })
+  .catch((error) => {
+    console.error("Unable to load compatibility database:", error);
+
+    $("#count").textContent = "Unable to load games";
+    $("#error").hidden = false;
+  });
+
+function updateSummary() {
+  const reports = games.reduce(
+    (total, game) => total + Number(game.reports || 0),
+    0
+  );
+
+  const playable = games.filter(
+    (game) => game.xodus === "playable"
+  ).length;
+
+  $("#total").textContent = games.length;
+  $("#playable").textContent = playable;
+  $("#reports").textContent = reports;
+}
 
 function render() {
-  const q = $("#q").value.trim().toLowerCase();
+  const query = $("#q").value.trim().toLowerCase();
   const tier = $("#tier").value;
 
-  const list = games
-    .filter(g => g.name.toLowerCase().includes(q))
-    .filter(g => !tier || g.xodus === tier)
-    .sort((a, b) => {
-      const va = order[a[sortKey]] ?? a[sortKey];
-      const vb = order[b[sortKey]] ?? b[sortKey];
-      return (va > vb ? 1 : va < vb ? -1 : 0) * sortDir;
+  const filtered = games
+    .filter((game) => {
+      if (!query) {
+        return true;
+      }
+
+      return [
+        game.name,
+        game.xodus,
+        game.xgameruntimeversion,
+        game.player,
+        game.additionalinformation
+      ]
+        .filter(Boolean)
+        .some((value) =>
+          String(value).toLowerCase().includes(query)
+        );
+    })
+    .filter((game) => {
+      if (!tier) {
+        return true;
+      }
+
+      if (tier === "unknown") {
+        return !game.xodus;
+      }
+
+      return game.xodus === tier;
+    })
+    .sort(compareGames);
+
+  $("#rows").innerHTML = filtered
+    .map(renderGame)
+    .join("");
+
+  $("#count").textContent =
+    filtered.length === games.length
+      ? `${filtered.length} games`
+      : `${filtered.length} of ${games.length} games`;
+
+  $("#empty").hidden = filtered.length !== 0;
+
+  bindGameButtons();
+}
+
+function compareGames(a, b) {
+  let result = 0;
+
+  if (sortKey === "reports") {
+    result = Number(a.reports || 0) - Number(b.reports || 0);
+  } else if (sortKey === "name") {
+    result = a.name.localeCompare(b.name);
+  } else if (sortKey === "updated") {
+    result = String(a.updated || "").localeCompare(
+      String(b.updated || "")
+    );
+  }
+
+  return result * sortDirection;
+}
+
+function renderGame(game, index) {
+  const status = getStatus(game.xodus);
+  const id = `game-${index}`;
+
+  return `
+    <article class="game" data-game="${id}">
+      <div class="game-main">
+        <div class="game-name">
+          <button
+            type="button"
+            aria-expanded="false"
+            aria-controls="${id}-details"
+          >
+            ${escapeHtml(game.name)}
+          </button>
+        </div>
+
+        <div class="game-status">
+          <span class="status status-${status.className}">
+            ${escapeHtml(status.label)}
+          </span>
+        </div>
+
+        <div class="game-reports">
+          ${Number(game.reports || 0)}
+          ${Number(game.reports || 0) === 1 ? "report" : "reports"}
+        </div>
+
+        <time class="game-date" datetime="${escapeHtml(game.updated || "")}">
+          ${formatDate(game.updated)}
+        </time>
+      </div>
+
+      <div
+        id="${id}-details"
+        class="game-details"
+        aria-hidden="true"
+      >
+        <div>
+          <div class="detail">
+            <span class="detail-label">Xodus</span>
+            <span class="detail-value">
+              ${escapeHtml(game.xodus || "No status reported")}
+            </span>
+          </div>
+
+          <div class="detail">
+            <span class="detail-label">Player</span>
+            <span class="detail-value player">
+              ${escapeHtml(game.player || "—")}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail">
+            <span class="detail-label">XGameRuntime</span>
+            <span class="detail-value runtime">
+              ${formatRuntime(game.xgameruntimeversion)}
+            </span>
+          </div>
+
+          ${
+            game.additionalinformation
+              ? `
+                <div class="detail">
+                  <span class="detail-label">Additional information</span>
+                  <span class="detail-value notes">
+                    ${escapeHtml(game.additionalinformation)}
+                  </span>
+                </div>
+              `
+              : ""
+          }
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function bindGameButtons() {
+  $$(".game-name button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const game = button.closest(".game");
+      const details = game.querySelector(".game-details");
+      const expanded = game.classList.toggle("open");
+
+      button.setAttribute("aria-expanded", String(expanded));
+      details.setAttribute("aria-hidden", String(!expanded));
+    });
+  });
+}
+
+function formatRuntime(value) {
+  if (!value) {
+    return "—";
+  }
+
+  const match = String(value).match(
+    /^(.*?)\s+commit\s+([0-9a-f]+)$/i
+  );
+
+  if (!match) {
+    return escapeHtml(value);
+  }
+
+  return `
+    <span class="runtime-name">
+      ${escapeHtml(match[1])}
+    </span>
+    <span class="commit">
+      ${escapeHtml(match[2])}
+    </span>
+  `;
+}
+
+function getStatus(value) {
+  if (!value) {
+    return {
+      className: "unknown",
+      label: "No status"
+    };
+  }
+
+  return {
+    className: value,
+    label: value
+  };
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(date);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]
+  );
+}
+
+["#q", "#tier"].forEach((selector) => {
+  $(selector).addEventListener("input", render);
+});
+
+$$(".sort-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    const key = button.dataset.sort;
+
+    if (sortKey === key) {
+      sortDirection *= -1;
+    } else {
+      sortKey = key;
+      sortDirection = key === "name" ? 1 : -1;
+    }
+
+    $$(".sort-button").forEach((item) => {
+      item.classList.toggle("active", item === button);
     });
 
-  $("#rows").innerHTML = list.map(g => `
-    <tr>
-      <td class="t ${g.id}">${esc(g.name)}</td>
-      <td class="t ${g.xodus}">${g.xodus}</td>
-      <td class="t ${g.xgameruntimeversion}">${g.xgameruntimeversion}</td>
-      <td class="num">${g.reports}</td>
-      <td class="t ${g.player}">${g.player}</td>
-      <td class="t ${g.additionalinformation}">${g.additionalinformation}</td>
-      <td>${g.updated}</td>
-    </tr>`).join("");
-  $("#count").textContent = `${list.length} game(s)`;
-}
-
-function esc(s) {
-  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "<", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-["#q", "#tier"].forEach(s => $(s).addEventListener("input", render));
-document.querySelectorAll("th[data-sort]").forEach(th =>
-  th.addEventListener("click", () => {
-    const k = th.dataset.sort;
-    sortDir = sortKey === k ? -sortDir : 1;
-    sortKey = k;
     render();
-  }));
+  });
+});
