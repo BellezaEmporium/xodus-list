@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>xodus_list</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">xodus_list</a>
+    <nav><a href="#">Games</a> <a href="#">Reports</a> <a href="#">About</a></nav>
+  </header>
+
+  <main>
+    <h1>Xodus compatiblity list</h1>
+    <p class="lead">Community-led list. We do not add anything more than what's already available.</p>
+
+    <div class="filters">
+      <input id="q" type="search" placeholder="Search for a game" autocomplete="off">
+      <select id="tier">
+        <option value="">All states</option>
+        <option value="perfect">Perfect</option>
+        <option value="playable">Playable</option>
+        <option value="menu">Menu</option>
+        <option value="unplayable">Unplayable</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="name">Game</th>
+          <th data-sort="xodus">Xodus version</th>
+          <th data-sort="xgameruntime">XGameRuntime version</th>
+          <th data-sort="reports" class="num">Reports</th>
+          <th data-sort="player">Player</th>
+          <th data-sort="additionalinformation">Additional information</th>
+          <th data-sort="updated">Updated at</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="count" class="muted"></p>
+  </main>
+
+  <footer>You may ask the website gently and check for the JSON database in /database.json.</footer>
+  <script src="app.js"></script>
+</body>
+</html>

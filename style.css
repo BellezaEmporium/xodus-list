@@ -1,0 +1,44 @@
+:root {
+  --bg: #f4f2ee; --fg: #1c1c1a; --muted: #6b6860; --line: #d6d2c8; --link: #1a4d8f;
+  --perfect: #2e6b3a; --playable: #6b6b1c; --menu: #9a5a12; --unplayable: #8f2a2a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181816; --fg: #e4e1d8; --muted: #8f8b80; --line: #33322d; --link: #7aa7e0;
+    --perfect: #6fbf80; --playable: #c4c45a; --menu: #d9984a; --unplayable: #d46a6a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 15px/1.5 Georgia, "Times New Roman", serif;
+}
+a { color: var(--link); }
+header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: .75rem 1.25rem; border-bottom: 1px solid var(--line);
+}
+.logo { font: bold 1rem ui-monospace, Menlo, Consolas, monospace; color: var(--fg); text-decoration: none; }
+nav a { margin-left: 1rem; }
+main { max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
+h1 { font-size: 1.4rem; margin: 0 0 .25rem; font-weight: normal; }
+.lead { margin: 0 0 1.5rem; color: var(--muted); }
+.filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+input, select {
+  font: inherit; padding: .3rem .5rem; background: var(--bg); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 2px;
+}
+input { flex: 1; min-width: 12rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid var(--line); }
+th { font-weight: normal; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
+th:hover { color: var(--fg); }
+td { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; }
+td:first-child { font-family: inherit; font-size: 1rem; }
+.num { text-align: right; }
+.t { text-transform: lowercase; }
+.perfect { color: var(--parfait); } .playable { color: var(--jouable); }
+.menu { color: var(--bugs); } .unplayable { color: var(--injouable); }
+.muted { color: var(--muted); font-size: .85rem; }
+footer { padding: 1rem 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+@media (max-width: 600px) { th:nth-child(5), td:nth-child(5) { display: none; } }
