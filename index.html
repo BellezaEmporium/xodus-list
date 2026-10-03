@@ -1,50 +1,134 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>xodus_list</title>
+  <meta name="description" content="Community-maintained Xodus game compatibility list.">
+  <title>Xodus compatibility list</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header>
-    <a href="/" class="logo">xodus_list</a>
-    <nav><a href="#">Games</a> <a href="#">Reports</a> <a href="#">About</a></nav>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <span class="brand-mark">x</span>
+        <span>xodus list</span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <a href="#games">Games</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <h1>Xodus compatiblity list</h1>
-    <p class="lead">Community-led list. We do not add anything more than what's already available.</p>
+  <main class="container">
+    <section class="intro">
+      <p class="eyebrow">XODUS / COMPATIBILITY</p>
 
-    <div class="filters">
-      <input id="q" type="search" placeholder="Search for a game" autocomplete="off">
-      <select id="tier">
-        <option value="">All states</option>
-        <option value="perfect">Perfect</option>
-        <option value="playable">Playable</option>
-        <option value="menu">Menu</option>
-        <option value="unplayable">Unplayable</option>
-      </select>
-    </div>
+      <h1>Compatibility list</h1>
 
-    <table>
-      <thead>
-        <tr>
-          <th data-sort="name">Game</th>
-          <th data-sort="xodus">Xodus version</th>
-          <th data-sort="xgameruntime">XGameRuntime version</th>
-          <th data-sort="reports" class="num">Reports</th>
-          <th data-sort="player">Player</th>
-          <th data-sort="additionalinformation">Additional information</th>
-          <th data-sort="updated">Updated at</th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <p id="count" class="muted"></p>
+      <p class="lead">
+        A community-maintained list of games tested with Xodus.
+        Reports are kept close to the information provided by their authors.
+      </p>
+    </section>
+
+    <section class="summary" aria-label="List summary">
+      <div>
+        <strong id="total">—</strong>
+        <span>games</span>
+      </div>
+
+      <div>
+        <strong id="playable">—</strong>
+        <span>playable</span>
+      </div>
+
+      <div>
+        <strong id="reports">—</strong>
+        <span>reports</span>
+      </div>
+    </section>
+
+    <section id="games" class="games-section">
+      <div class="toolbar">
+        <label class="search">
+          <span class="sr-only">Search games</span>
+          <input
+            id="q"
+            type="search"
+            placeholder="Search games, runtime, notes..."
+            autocomplete="off"
+          >
+        </label>
+
+        <label>
+          <span class="sr-only">Filter by status</span>
+          <select id="tier">
+            <option value="">All statuses</option>
+            <option value="perfect">Perfect</option>
+            <option value="playable">Playable</option>
+            <option value="menu">Menu</option>
+            <option value="unplayable">Unplayable</option>
+            <option value="unknown">No status</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="list-meta">
+        <span id="count">Loading...</span>
+
+        <div class="sort">
+          <span>Sort:</span>
+          <button type="button" class="sort-button active" data-sort="reports">
+            Reports
+          </button>
+          <button type="button" class="sort-button" data-sort="name">
+            Name
+          </button>
+          <button type="button" class="sort-button" data-sort="updated">
+            Updated
+          </button>
+        </div>
+      </div>
+
+      <div id="rows" class="game-list" aria-live="polite"></div>
+
+      <p id="empty" class="empty" hidden>
+        No games match your search.
+      </p>
+
+      <p id="error" class="error" hidden>
+        The compatibility database could not be loaded.
+      </p>
+    </section>
+
+    <section id="about" class="about">
+      <p class="eyebrow">ABOUT THIS LIST</p>
+
+      <h2>Community reports, kept simple.</h2>
+
+      <p>
+        This list collects compatibility reports for Xodus and the
+        XGameRuntime components used by individual games. Versions and
+        technical notes are shown as reported rather than rewritten.
+      </p>
+
+      <p class="about-note">
+        The database is available as <code>database.json</code>.
+      </p>
+    </section>
   </main>
 
-  <footer>You may ask the website gently and check for the JSON database in /database.json.</footer>
+  <footer class="site-footer">
+    <div class="container">
+      <span>xodus list</span>
+      <span>Community-maintained compatibility information</span>
+    </div>
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>
