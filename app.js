@@ -152,43 +152,40 @@ function renderGame(game, index) {
         class="game-details"
         aria-hidden="true"
       >
-        <div>
-          <div class="detail">
-            <span class="detail-label">Xodus</span>
-            <span class="detail-value">
-              ${escapeHtml(game.xodus || "No status reported")}
-            </span>
-          </div>
-
-          <div class="detail">
-            <span class="detail-label">Player</span>
-            <span class="detail-value player">
-              ${escapeHtml(game.player || "—")}
-            </span>
-          </div>
+        <div class="detail">
+          <span class="detail-label">Xodus</span>
+          <span class="detail-value">
+            ${escapeHtml(game.xodus || "No status reported")}
+          </span>
         </div>
-
-        <div>
-          <div class="detail">
-            <span class="detail-label">XGameRuntime</span>
-            <span class="detail-value runtime">
-              ${formatRuntime(game.xgameruntimeversion)}
-            </span>
-          </div>
-
-          ${
-            game.additionalinformation
-              ? `
-                <div class="detail">
-                  <span class="detail-label">Additional information</span>
-                  <span class="detail-value notes">
-                    ${escapeHtml(game.additionalinformation)}
-                  </span>
-                </div>
-              `
-              : ""
-          }
+      
+        <div class="detail">
+          <span class="detail-label">XGameRuntime</span>
+          <span class="detail-value runtime">
+            ${formatRuntime(game.xgameruntimeversion)}
+          </span>
         </div>
+      
+        <div class="detail">
+          <span class="detail-label">Player</span>
+          <span class="detail-value player">
+            ${escapeHtml(game.player || "—")}
+          </span>
+        </div>
+      
+        ${
+          game.additionalinformation
+            ? `
+              <div class="detail additional-information">
+                <span class="detail-label">Additional information</span>
+                <span class="detail-value notes">
+                  ${escapeHtml(game.additionalinformation)}
+                </span>
+              </div>
+            `
+            : ""
+        }
+      </div>
       </div>
     </article>
   `;
