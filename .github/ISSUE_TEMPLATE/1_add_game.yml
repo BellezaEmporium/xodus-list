@@ -1,0 +1,54 @@
+name: ➕ Add game
+description: Add a game to xodus-list
+title: 'Game addition: '
+labels: ['xodus-list:add']
+
+body:
+  - type: input
+    id: game_name
+    attributes:
+      label: Game name (required)
+      description: "The name of the game you want to add in the database. Please refrain from using acronyms or diminutives, as not everybody might know it (eg. BOTK for Breath of the Wild)."
+      placeholder: 'This Awesome Game'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: xodus
+    attributes:
+      label: Classification (required)
+      description: "The performance rating of the game running under Xodus."
+      options:
+        - 'Perfect'
+        - 'Playable'
+        - 'Menu'
+        - 'Unplayable'
+    validations:
+      required: true
+
+  - type: input
+    id: xgameruntime
+    attributes:
+      label: XGameRuntime version
+      description: "In the case of a separate build of the XGameRuntime DLL files, please indicate it to us by specifying the repository, the tree and commit version to better target the version." 
+      placeholder: "xodus-gaming xgameruntime commit <sha256>"
+    validations:
+      required: false
+
+  - type: input
+    id: player
+    attributes:
+      label: Player name (required)
+      description: "Specify the name in which you want to appear in our database. Preferably your Xbox Gamertag or Discord account if you're in the Game Launchers Reverse Engineering server."
+      placeholder: "bellezaemporium"
+    validations:
+      required: true
+
+  - type: input
+    id: additional_information
+    attributes:
+      label: Additional information
+      description: "Is there anything you needed to tackle on to make sure the game ran properly ? Indicate it to us."
+      placeholder: "the game needs a specific XCurl fix in order to run"
+    validations:
+      required: false
